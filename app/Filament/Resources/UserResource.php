@@ -29,6 +29,9 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationGroup = 'Admin & Employees Managment';
+    protected static ?string $navigationLabel = 'Admin';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -38,7 +41,7 @@ class UserResource extends Resource
                 Card::make()
                         ->schema([
                             TextInput::make('name')->label('Username')->maxLength(50)->required(),
-                TextInput::make('email')->email()->label('Email Address')->required(),
+                TextInput::make('email')->email()->label('Email Address')->required()->unique(),
                 TextInput::make('password')
                 ->password()
                 ->required()
@@ -56,7 +59,8 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email'),
-                ToggleColumn::make('isAdmin')->label('Affecte Admin'),
+                ToggleColumn::make('isAdmin')->label('Affecte Admin')->onColor('success')
+                ->offColor('danger'),
                 TextColumn::make('created_at'),
             ])
             ->filters([
