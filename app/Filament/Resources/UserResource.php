@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use delete;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
@@ -9,6 +10,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Card;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Actions\EditAction;
@@ -62,12 +64,29 @@ class UserResource extends Resource
                 ToggleColumn::make('isAdmin')->label('Affecte Admin')->onColor('success')
                 ->offColor('danger'),
                 TextColumn::make('created_at'),
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('delete')
+                ->action(fn (User $record) => $record->delete())
+                ->requiresConfirmation(),
+                
+
+                /*-------------------NOT WORKING------------------------*/
+                
+                // Action::make('delete ')
+                // ->action(fn () => $this->record->delete())
+                // ->requiresConfirmation()
+                // ->modalHeading('Delete User')
+                // ->modalSubheading('Are you sure you\'d like to delete these User? This cannot be undone.')
+                // ->modalButton('Yes, delete User')
+
+                 /*-------------------------------------------*/
+                    
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -85,8 +104,8 @@ class UserResource extends Resource
     {
         return [
             'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            // 'create' => Pages\CreateUser::route('/create'),
+            // 'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }    
 }

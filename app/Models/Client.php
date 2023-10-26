@@ -18,4 +18,8 @@ class Client extends Model
     'clients_status',
     'phone',
     'email'];
+
+    public function client_record() {
+        return $this->hasMany(ClientRecord::class);
+    }
 }

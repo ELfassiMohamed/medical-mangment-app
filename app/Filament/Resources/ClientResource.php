@@ -3,19 +3,24 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use App\Models\User;
 use Filament\Tables;
 use App\Models\Client;
+use App\Models\ClientRecord;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Actions\CreateAction;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\DeleteBulkAction;
 use App\Filament\Resources\ClientResource\Pages;
@@ -92,6 +97,23 @@ class ClientResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                CreateAction::make()
+                ->label('Client Record')
+                            ->model(ClientRecord::class)
+                            ->form([
+                                Repeater::make('members')
+                                    ->schema([
+            //   Probleme          Select::make('client_id')->relationship('client_record', 'first_name'),
+                                TextInput::make('operation_type')->maxLength(50)->required(),
+                                DatePicker::make('operation_date')->required(),   
+                                TextInput::make('operation_cost')->maxLength(50)->required(),
+                                Radio::make('isPayed')
+                                        ->label('Do you like this post?')
+                                        ->boolean()
+                                    ])
+                                    ->columns(2)
+                            ])
+                
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
