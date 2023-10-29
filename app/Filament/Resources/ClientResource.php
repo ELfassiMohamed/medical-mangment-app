@@ -11,6 +11,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Card;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -44,34 +45,34 @@ class ClientResource extends Resource
         return $form
             ->schema([
                 Card::make()
-                ->schema([
-                    TextInput::make('first_name')->label('First Name')->maxLength(50)->required(), 
-                    TextInput::make('last_name')->label('Last Name')->maxLength(50)->required(),
-                    DatePicker::make('birth_date')->label('Birth Date')->required(),
-                    Textarea::make('address')->label('Address')->rows(2)->required(),
-                    TextInput::make('phone')->label('Phone Number')->prefix('+212')->tel()->required(),
-                    TextInput::make('email')->label('Email Address')->email(),
-                    Radio::make('sexe')->label('Client Gender : ')->options([
-                        'sexe1' => 'Male',
-                        'sexe2' => 'Female',
-                                            
-                    ])->columns(2)->inline(),
-                    Radio::make('clients_status')->label('Client Status : ')->options([
-                        'C1' => 'Still Active',
-                        'C2' => 'Finished',
-                                            
+                    ->schema([
+                        TextInput::make('first_name')->label('First Name')->maxLength(50)->required(),
+                        TextInput::make('last_name')->label('Last Name')->maxLength(50)->required(),
+                        DatePicker::make('birth_date')->label('Birth Date')->required(),
+                        Textarea::make('address')->label('Address')->rows(2)->required(),
+                        TextInput::make('phone')->label('Phone Number')->prefix('+212')->tel()->required(),
+                        TextInput::make('email')->label('Email Address')->email(),
+                        Radio::make('sexe')->label('Client Gender : ')->options([
+                            'sexe1' => 'Male',
+                            'sexe2' => 'Female',
+
+                        ])->columns(2)->inline(),
+                        Radio::make('clients_status')->label('Client Status : ')->options([
+                            'C1' => 'Still Active',
+                            'C2' => 'Finished',
+
+                        ])
+                            ->descriptions([
+                                'C1' => 'Still an active client',
+                                'C2' => 'not an active client',
+
+                            ])
+                            ->columns(2)->inline()
+
+
+
                     ])
-                    ->descriptions([
-                        'C1' => 'Still an active client',
-                        'C2' => 'not an active client',
-                        
-                    ])
-                    ->columns(2)->inline()
-    
-   
-                                            
-                ])
-                ->columns(2)
+                    ->columns(2)
             ]);
     }
 
@@ -84,49 +85,50 @@ class ClientResource extends Resource
                 TextColumn::make('sexe')->label('Client Gender')->enum([
                     'sexe1' => 'Male',
                     'sexe2' => 'Female',
-                ]) ->size('lg'),
+                ])->size('lg'),
                 TextColumn::make('clients_status')->label('Client Status')->enum([
                     'C1' => 'Still Active',
-                    'C2' => 'Finished', 
-                ]) ->size('lg'),
+                    'C2' => 'Finished',
+                ])->size('lg'),
                 TextColumn::make('created_at'),
-                
+
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                CreateAction::make()
-                ->label('Client Record')
-                            ->model(ClientRecord::class)
-                            ->form([
-                                Repeater::make('members')
-                                    ->schema([
-            //   Probleme          Select::make('client_id')->relationship('client_record', 'first_name'),
+                Action::make('Client Record')
+                    ->label('Client Record')
+                    //->model(ClientRecord::class)
+                    ->action(fn (Client $record) =>
+                   $record->client_id = $record->id)
+                    ->form([
+                        Repeater::make('client_records')
+                            ->schema([
                                 TextInput::make('operation_type')->maxLength(50)->required(),
-                                DatePicker::make('operation_date')->required(),   
+                                DatePicker::make('operation_date')->required(),
                                 TextInput::make('operation_cost')->maxLength(50)->required(),
                                 Radio::make('isPayed')
-                                        ->label('Do you like this post?')
-                                        ->boolean()
-                                    ])
-                                    ->columns(2)
+                                    ->label('is it payed?')
+                                    ->boolean()
                             ])
-                
+                            ->columns(2)
+                    ])
+
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -134,5 +136,5 @@ class ClientResource extends Resource
             'create' => Pages\CreateClient::route('/create'),
             'edit' => Pages\EditClient::route('/{record}/edit'),
         ];
-    }    
+    }
 }
